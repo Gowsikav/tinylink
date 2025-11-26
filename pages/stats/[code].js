@@ -1,15 +1,18 @@
+import prisma from "../../lib/prisma";
 import { format } from "date-fns";
 
 export async function getServerSideProps({ params }) {
-  const res = await fetch(
-    process.env.NEXT_PUBLIC_BASE_URL + "/api/links/" + params.code
-  );
-  if (res.status !== 200) return { notFound: true };
-  const link = await res.json();
+  const { code } = params;
+
+  // Fetch link directly from the database
+  const link = await prisma.link.findUnique({ where: { code } });
+
+  if (!link) return { notFound: true };
+
   return { props: { link } };
 }
 
-export default function CodePage({ link }) {
+export default function StatsPage({ link }) {
   return (
     <div style={{ maxWidth: 700, margin: "40px auto", padding: "0 16px" }}>
       <h1>Stats for {link.code}</h1>
@@ -32,4 +35,3 @@ export default function CodePage({ link }) {
     </div>
   );
 }
- 
